@@ -17,12 +17,10 @@ const createUser = (req: Request, res: Response) => {
 
   return User.create({ name, about, avatar })
     .then((user) => {
-      if (!user) {
-        throw new IncorrectDataTransmitted();
-      }
       res.send({ data: user });
     })
     .catch((err) => {
+      console.log(err);
       throw new defaultError();
     });
 };
@@ -53,11 +51,6 @@ const updateProfile = (req: Request, res: Response) => {
       new: true,
       upsert: true,
       runValidators: true,
-    },
-    function (err, model) {
-      if (err) {
-        throw new IncorrectDataTransmitted();
-      }
     }
   )
     .then((user) => {
@@ -82,11 +75,6 @@ const updateAvatar = (req: Request, res: Response) => {
       new: true,
       upsert: true,
       runValidators: true,
-    },
-    function (err, model) {
-      if (err) {
-        throw new IncorrectDataTransmitted();
-      }
     }
   )
     .then((user) => {
