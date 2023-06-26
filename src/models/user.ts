@@ -1,3 +1,4 @@
+import { ERRORS_MESSAGES_SEPARATOR } from "../constants/separators";
 import IncorrectDataTransmitted from "../errors/incorrect-data-transmitted";
 import mongoose from "mongoose";
 
@@ -15,9 +16,7 @@ const userSchema = new mongoose.Schema({
       validator: (name: string) => {
         return /[A-Za-z\u0410-\u044F\u0401\u0451]{2,30}/.test(name);
       },
-      message: () => {
-        throw new IncorrectDataTransmitted("Некорректное имя.");
-      },
+      message: `${ERRORS_MESSAGES_SEPARATOR}Некорректное имя.`,
     },
   },
   about: {
@@ -27,9 +26,7 @@ const userSchema = new mongoose.Schema({
       validator: (about: string) => {
         return /[A-Za-z\u0410-\u044F\u0401\u0451]{2,200}/.test(about);
       },
-      message: () => {
-        throw new IncorrectDataTransmitted("Проверьте поле с описанием.");
-      },
+      message: `${ERRORS_MESSAGES_SEPARATOR}Проверьте поле с описанием.`,
     },
   },
   avatar: {
@@ -41,9 +38,7 @@ const userSchema = new mongoose.Schema({
           avatar
         );
       },
-      message: () => {
-        throw new IncorrectDataTransmitted("Неправильная ссылка на аватар.");
-      },
+      message: `${ERRORS_MESSAGES_SEPARATOR}Неправильная ссылка на аватар.`,
     },
   },
 });

@@ -1,18 +1,18 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import User from "../models/user";
 import defaultError from "../errors/default-error";
 import NotFoundError from "../errors/not-found-err";
 import IncorrectDataTransmitted from "../errors/incorrect-data-transmitted";
 
-const getUsers = (req: Request, res: Response) => {
+const getUsers = (req: Request, res: Response, next: NextFunction) => {
   User.find({})
     .then((users) => res.send({ data: users }))
     .catch((err) => {
-      throw new defaultError();
+      next(new defaultError(err));
     });
 };
 
-const createUser = (req: Request, res: Response) => {
+const createUser = (req: Request, res: Response, next: NextFunction) => {
   const { name, about, avatar } = req.body;
 
   return User.create({ name, about, avatar })
@@ -20,27 +20,29 @@ const createUser = (req: Request, res: Response) => {
       res.send({ data: user });
     })
     .catch((err) => {
-      console.log(err);
-      throw new defaultError();
+      if (err) {
+        next(new IncorrectDataTransmitted(err.message));
+      }
+      next(new defaultError(err.message));
     });
 };
 
-const getUser = (req: Request, res: Response) => {
+const getUser = (req: Request, res: Response, next: NextFunction) => {
   const { userId } = req.params;
 
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        throw new NotFoundError();
+        next(new NotFoundError());
       }
       res.send({ data: user });
     })
     .catch((err) => {
-      throw new defaultError();
+      next(new defaultError(err.message));
     });
 };
 
-const updateProfile = (req: Request, res: Response) => {
+const updateProfile = (req: Request, res: Response, next: NextFunction) => {
   const { name, about } = req.body;
   const userId = req.body.user._id;
 
@@ -55,16 +57,19 @@ const updateProfile = (req: Request, res: Response) => {
   )
     .then((user) => {
       if (!user) {
-        throw new NotFoundError();
+        next(new NotFoundError());
       }
       res.send({ data: user });
     })
     .catch((err) => {
-      throw new defaultError();
+      if (err) {
+        next(new IncorrectDataTransmitted(err.message));
+      }
+      next(new defaultError(err.message));
     });
 };
 
-const updateAvatar = (req: Request, res: Response) => {
+const updateAvatar = (req: Request, res: Response, next: NextFunction) => {
   const { avatar } = req.body;
   const userId = req.body.user._id;
 
@@ -79,12 +84,15 @@ const updateAvatar = (req: Request, res: Response) => {
   )
     .then((user) => {
       if (!user) {
-        throw new NotFoundError();
+        next(new NotFoundError());
       }
       res.send({ data: user });
     })
     .catch((err) => {
-      throw new defaultError();
+      if (err) {
+        next(new IncorrectDataTransmitted(err.message));
+      }
+      next(new defaultError(err.message));
     });
 };
 

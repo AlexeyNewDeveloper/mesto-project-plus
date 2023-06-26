@@ -1,13 +1,16 @@
+import { ERRORS_MESSAGES_SEPARATOR } from "../constants/separators";
 import IncorrectDataTransmitted from "../errors/incorrect-data-transmitted";
 import mongoose, { Date } from "mongoose";
 
 interface ICard {
   name: string;
-  about: string;
-  avatar: string;
+  link: string;
+  owner: mongoose.Schema.Types.ObjectId;
+  likes: mongoose.Schema.Types.Array;
+  createdAt: Date;
 }
 
-const cardSchema = new mongoose.Schema({
+const cardSchema = new mongoose.Schema<ICard>({
   name: {
     type: String,
     required: true,
@@ -15,9 +18,7 @@ const cardSchema = new mongoose.Schema({
       validator: (name: string) => {
         return /[A-Za-z\u0410-\u044F\u0401\u0451]{2,30}/.test(name);
       },
-      message: () => {
-        throw new IncorrectDataTransmitted();
-      },
+      message: `${ERRORS_MESSAGES_SEPARATOR}Некорректное имя.`,
     },
   },
   link: {
@@ -29,9 +30,7 @@ const cardSchema = new mongoose.Schema({
           link
         );
       },
-      message: () => {
-        throw new IncorrectDataTransmitted();
-      },
+      message: `${ERRORS_MESSAGES_SEPARATOR}Некорректная ссылка на картинку.`,
     },
   },
   owner: {
@@ -42,9 +41,7 @@ const cardSchema = new mongoose.Schema({
       validator: (owner: string) => {
         return mongoose.Types.ObjectId.isValid(owner);
       },
-      message: () => {
-        throw new IncorrectDataTransmitted();
-      },
+      message: `${ERRORS_MESSAGES_SEPARATOR}Ошибка.`,
     },
   },
   likes: {
@@ -55,9 +52,7 @@ const cardSchema = new mongoose.Schema({
       validator: (likes: Array<string>) => {
         return likes.every((value) => mongoose.Types.ObjectId.isValid(value));
       },
-      message: () => {
-        throw new IncorrectDataTransmitted();
-      },
+      message: `${ERRORS_MESSAGES_SEPARATOR}Ошибка.`,
     },
   },
   createdAt: {
@@ -67,9 +62,7 @@ const cardSchema = new mongoose.Schema({
       validator: (date: Date) => {
         return date instanceof Date;
       },
-      message: () => {
-        throw new IncorrectDataTransmitted();
-      },
+      message: `${ERRORS_MESSAGES_SEPARATOR}Ошибка.`,
     },
   },
 });
