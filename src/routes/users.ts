@@ -7,7 +7,7 @@ const router = Router();
 router.get("/", UsersControllers.getUsers);
 router.post("/", UsersControllers.createUser);
 router.get("/:userId", UsersControllers.getUser);
-router.patch("/me", UsersControllers.getUser);
-router.patch("/me/avatar", UsersControllers.getUser);
+router.patch("/me", UsersControllers.updateProfile);
+router.patch("/me/avatar", UsersControllers.updateAvatar);
 
 export default router;

@@ -2,9 +2,11 @@ import { Request, Response } from "express";
 import Card from "../models/card";
 import defaultError from "../errors/default-error";
 import NotFoundError from "../errors/not-found-err";
+import IncorrectDataTransmitted from "../errors/incorrect-data-transmitted";
 
 export const getCards = (req: Request, res: Response) => {
   Card.find({})
+    .populate("owner")
     .then((cards) => res.send({ data: cards }))
     .catch((err) => {
       throw new defaultError();
@@ -15,7 +17,16 @@ export const createCard = (req: Request, res: Response) => {
   const { name, link, user } = req.body;
 
   return Card.create({ name, link, owner: user })
-    .then((card) => res.send({ data: card }))
+    .then((card) => {
+      card
+        .populate("owner")
+        .then((card) => {
+          res.send({ data: card });
+        })
+        .catch((err) => {
+          throw new IncorrectDataTransmitted();
+        });
+    })
     .catch((err) => {
       throw new defaultError();
     });
@@ -37,7 +48,7 @@ export const deleteCard = (req: Request, res: Response) => {
     });
 };
 
-export const likeCard = (req: Request, res: Response) =>
+export const likeCard = (req: Request, res: Response) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.body.user._id } },
@@ -53,6 +64,7 @@ export const likeCard = (req: Request, res: Response) =>
     .catch((err) => {
       throw new defaultError();
     });
+};
 
 export const dislikeCard = (req: Request, res: Response) =>
   Card.findByIdAndUpdate(

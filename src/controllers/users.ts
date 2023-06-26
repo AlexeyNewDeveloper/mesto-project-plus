@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import User from "../models/user";
 import defaultError from "../errors/default-error";
 import NotFoundError from "../errors/not-found-err";
-import { notStrictEqual } from "assert";
+import IncorrectDataTransmitted from "../errors/incorrect-data-transmitted";
 
 const getUsers = (req: Request, res: Response) => {
   User.find({})
@@ -16,7 +16,12 @@ const createUser = (req: Request, res: Response) => {
   const { name, about, avatar } = req.body;
 
   return User.create({ name, about, avatar })
-    .then((user) => res.send({ data: user }))
+    .then((user) => {
+      if (!user) {
+        throw new IncorrectDataTransmitted();
+      }
+      res.send({ data: user });
+    })
     .catch((err) => {
       throw new defaultError();
     });
@@ -46,8 +51,13 @@ const updateProfile = (req: Request, res: Response) => {
     { name, about },
     {
       new: true,
-      runValidators: true,
       upsert: true,
+      runValidators: true,
+    },
+    function (err, model) {
+      if (err) {
+        throw new IncorrectDataTransmitted();
+      }
     }
   )
     .then((user) => {
@@ -70,8 +80,13 @@ const updateAvatar = (req: Request, res: Response) => {
     { avatar },
     {
       new: true,
-      runValidators: true,
       upsert: true,
+      runValidators: true,
+    },
+    function (err, model) {
+      if (err) {
+        throw new IncorrectDataTransmitted();
+      }
     }
   )
     .then((user) => {
