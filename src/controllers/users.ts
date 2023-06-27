@@ -1,14 +1,14 @@
-import { Request, Response, NextFunction } from "express";
-import User from "../models/user";
-import defaultError from "../errors/default-error";
-import NotFoundError from "../errors/not-found-err";
-import IncorrectDataTransmitted from "../errors/incorrect-data-transmitted";
+import { Request, Response, NextFunction } from 'express';
+import User from '../models/user';
+import DefaultError from '../errors/default-error';
+import NotFoundError from '../errors/not-found-err';
+import IncorrectDataTransmitted from '../errors/incorrect-data-transmitted';
 
 const getUsers = (req: Request, res: Response, next: NextFunction) => {
   User.find({})
     .then((users) => res.send({ data: users }))
     .catch((err) => {
-      next(new defaultError(err));
+      next(new DefaultError(err));
     });
 };
 
@@ -23,7 +23,7 @@ const createUser = (req: Request, res: Response, next: NextFunction) => {
       if (err) {
         next(new IncorrectDataTransmitted(err.message));
       }
-      next(new defaultError(err.message));
+      next(new DefaultError(err.message));
     });
 };
 
@@ -38,7 +38,7 @@ const getUser = (req: Request, res: Response, next: NextFunction) => {
       res.send({ data: user });
     })
     .catch((err) => {
-      next(new defaultError(err.message));
+      next(new DefaultError(err.message));
     });
 };
 
@@ -53,7 +53,7 @@ const updateProfile = (req: Request, res: Response, next: NextFunction) => {
       new: true,
       upsert: true,
       runValidators: true,
-    }
+    },
   )
     .then((user) => {
       if (!user) {
@@ -65,7 +65,7 @@ const updateProfile = (req: Request, res: Response, next: NextFunction) => {
       if (err) {
         next(new IncorrectDataTransmitted(err.message));
       }
-      next(new defaultError(err.message));
+      next(new DefaultError(err.message));
     });
 };
 
@@ -80,7 +80,7 @@ const updateAvatar = (req: Request, res: Response, next: NextFunction) => {
       new: true,
       upsert: true,
       runValidators: true,
-    }
+    },
   )
     .then((user) => {
       if (!user) {
@@ -92,7 +92,7 @@ const updateAvatar = (req: Request, res: Response, next: NextFunction) => {
       if (err) {
         next(new IncorrectDataTransmitted(err.message));
       }
-      next(new defaultError(err.message));
+      next(new DefaultError(err.message));
     });
 };
 

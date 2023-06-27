@@ -1,1 +1,5 @@
-export const ERRORS_MESSAGES_SEPARATOR = "$";
+const ERRORS_MESSAGES_SEPARATOR = '$';
+
+export default {
+  ERRORS_MESSAGES_SEPARATOR,
+};
