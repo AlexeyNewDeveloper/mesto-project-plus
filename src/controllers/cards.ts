@@ -30,18 +30,20 @@ export const createCard = (req: Request, res: Response, next: NextFunction) => {
     .catch((err) => {
       if (err) {
         next(new IncorrectDataTransmitted(err.message));
+        return;
       }
-      next(new DefaultError(err.message));
+      next(new DefaultError());
     });
 };
 
 export const deleteCard = (req: Request, res: Response, next: NextFunction) => {
   const { cardId } = req.params;
 
-  Card.findById(cardId)
+  Card.findByIdAndRemove(cardId)
     .then((card) => {
       if (!card) {
         next(new NotFoundError());
+        return;
       }
 
       res.send({ data: card });
@@ -60,6 +62,7 @@ export const likeCard = (req: Request, res: Response, next: NextFunction) => {
     .then((card) => {
       if (!card) {
         next(new NotFoundError());
+        return;
       }
 
       res.send({ data: card });
@@ -67,8 +70,9 @@ export const likeCard = (req: Request, res: Response, next: NextFunction) => {
     .catch((err) => {
       if (err) {
         next(new IncorrectDataTransmitted(err.message));
+        return;
       }
-      next(new DefaultError(err.message));
+      next(new DefaultError());
     });
 };
 
@@ -81,6 +85,7 @@ export const dislikeCard = (req: Request, res: Response, next: NextFunction) => 
   .then((card) => {
     if (!card) {
       next(new NotFoundError());
+      return;
     }
 
     res.send({ data: card });
@@ -88,6 +93,7 @@ export const dislikeCard = (req: Request, res: Response, next: NextFunction) => 
   .catch((err) => {
     if (err) {
       next(new IncorrectDataTransmitted(err.message));
+      return;
     }
-    next(new DefaultError(err.message));
+    next(new DefaultError());
   });

@@ -22,8 +22,9 @@ const createUser = (req: Request, res: Response, next: NextFunction) => {
     .catch((err) => {
       if (err) {
         next(new IncorrectDataTransmitted(err.message));
+        return;
       }
-      next(new DefaultError(err.message));
+      next(new DefaultError());
     });
 };
 
@@ -34,6 +35,7 @@ const getUser = (req: Request, res: Response, next: NextFunction) => {
     .then((user) => {
       if (!user) {
         next(new NotFoundError());
+        return;
       }
       res.send({ data: user });
     })
@@ -51,21 +53,22 @@ const updateProfile = (req: Request, res: Response, next: NextFunction) => {
     { name, about },
     {
       new: true,
-      upsert: true,
       runValidators: true,
     },
   )
     .then((user) => {
       if (!user) {
         next(new NotFoundError());
+        return;
       }
       res.send({ data: user });
     })
     .catch((err) => {
       if (err) {
         next(new IncorrectDataTransmitted(err.message));
+        return;
       }
-      next(new DefaultError(err.message));
+      next(new DefaultError());
     });
 };
 
@@ -85,14 +88,16 @@ const updateAvatar = (req: Request, res: Response, next: NextFunction) => {
     .then((user) => {
       if (!user) {
         next(new NotFoundError());
+        return;
       }
       res.send({ data: user });
     })
     .catch((err) => {
       if (err) {
         next(new IncorrectDataTransmitted(err.message));
+        return;
       }
-      next(new DefaultError(err.message));
+      next(new DefaultError());
     });
 };
 
