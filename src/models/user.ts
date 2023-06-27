@@ -1,6 +1,7 @@
-import { ERRORS_MESSAGES_SEPARATOR } from "../constants/separators";
-import IncorrectDataTransmitted from "../errors/incorrect-data-transmitted";
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
+import errorSeparator from '../constants/separators';
+
+const separator = errorSeparator.ERRORS_MESSAGES_SEPARATOR;
 
 interface IUser {
   name: string;
@@ -13,34 +14,28 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     validate: {
-      validator: (name: string) => {
-        return /[A-Za-z\u0410-\u044F\u0401\u0451]{2,30}/.test(name);
-      },
-      message: `${ERRORS_MESSAGES_SEPARATOR}Некорректное имя.`,
+      validator: (name: string) => /[A-Za-z\u0410-\u044F\u0401\u0451]{2,30}/.test(name),
+      message: `${separator}Некорректное имя.`,
     },
   },
   about: {
     type: String,
     required: true,
     validate: {
-      validator: (about: string) => {
-        return /[A-Za-z\u0410-\u044F\u0401\u0451]{2,200}/.test(about);
-      },
-      message: `${ERRORS_MESSAGES_SEPARATOR}Проверьте поле с описанием.`,
+      validator: (about: string) => /[A-Za-z\u0410-\u044F\u0401\u0451]{2,200}/.test(about),
+      message: `${separator}Проверьте поле с описанием.`,
     },
   },
   avatar: {
     type: String,
     required: true,
     validate: {
-      validator: (avatar: string) => {
-        return /(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-])/.test(
-          avatar
-        );
-      },
-      message: `${ERRORS_MESSAGES_SEPARATOR}Неправильная ссылка на аватар.`,
+      validator: (avatar: string) => /(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\\/~+#-]*[\w@?^=%&\\/~+#-])/.test(
+        avatar,
+      ),
+      message: `${separator}Неправильная ссылка на аватар.`,
     },
   },
 });
 
-export default mongoose.model<IUser>("user", userSchema);
+export default mongoose.model<IUser>('user', userSchema);
