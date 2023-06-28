@@ -3,6 +3,7 @@ import Card from '../models/card';
 import DefaultError from '../errors/default-error';
 import NotFoundError from '../errors/not-found-err';
 import IncorrectDataTransmitted from '../errors/incorrect-data-transmitted';
+import errorNames from '../constants/error-names';
 
 export const getCards = (req: Request, res: Response, next: NextFunction) => {
   Card.find({})
@@ -28,7 +29,7 @@ export const createCard = (req: Request, res: Response, next: NextFunction) => {
         });
     })
     .catch((err) => {
-      if (err) {
+      if (err.name === errorNames.VALIDATION_FIELD_ERROR) {
         next(new IncorrectDataTransmitted(err.message));
         return;
       }
@@ -68,7 +69,7 @@ export const likeCard = (req: Request, res: Response, next: NextFunction) => {
       res.send({ data: card });
     })
     .catch((err) => {
-      if (err) {
+      if (err.name === errorNames.VALIDATION_FIELD_ERROR) {
         next(new IncorrectDataTransmitted(err.message));
         return;
       }
@@ -91,7 +92,7 @@ export const dislikeCard = (req: Request, res: Response, next: NextFunction) => 
     res.send({ data: card });
   })
   .catch((err) => {
-    if (err) {
+    if (err.name === errorNames.VALIDATION_FIELD_ERROR) {
       next(new IncorrectDataTransmitted(err.message));
       return;
     }
