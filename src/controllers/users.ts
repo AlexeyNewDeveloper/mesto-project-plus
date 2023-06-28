@@ -3,6 +3,7 @@ import User from '../models/user';
 import DefaultError from '../errors/default-error';
 import NotFoundError from '../errors/not-found-err';
 import IncorrectDataTransmitted from '../errors/incorrect-data-transmitted';
+import errorNames from '../constants/error-names';
 
 const getUsers = (req: Request, res: Response, next: NextFunction) => {
   User.find({})
@@ -20,7 +21,7 @@ const createUser = (req: Request, res: Response, next: NextFunction) => {
       res.send({ data: user });
     })
     .catch((err) => {
-      if (err) {
+      if (err.name === errorNames.VALIDATION_FIELD_ERROR) {
         next(new IncorrectDataTransmitted(err.message));
         return;
       }
@@ -64,7 +65,7 @@ const updateProfile = (req: Request, res: Response, next: NextFunction) => {
       res.send({ data: user });
     })
     .catch((err) => {
-      if (err) {
+      if (err.name === errorNames.VALIDATION_FIELD_ERROR) {
         next(new IncorrectDataTransmitted(err.message));
         return;
       }
@@ -93,7 +94,7 @@ const updateAvatar = (req: Request, res: Response, next: NextFunction) => {
       res.send({ data: user });
     })
     .catch((err) => {
-      if (err) {
+      if (err.name === errorNames.VALIDATION_FIELD_ERROR) {
         next(new IncorrectDataTransmitted(err.message));
         return;
       }
