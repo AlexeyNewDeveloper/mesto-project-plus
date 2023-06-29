@@ -1,9 +1,28 @@
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import User from '../models/user';
 import DefaultError from '../errors/default-error';
 import NotFoundError from '../errors/not-found-err';
+import DenialOfAccessError from '../errors/denial-of-access-error';
 import IncorrectDataTransmitted from '../errors/incorrect-data-transmitted';
 import errorNames from '../constants/error-names';
+
+const login = (req: Request, res: Response, next: NextFunction) => {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+      res.set({
+        'Set-Cookie': `token=${token}`,
+      });
+      res.send({ token });
+    })
+    .catch((err: Error) => {
+      next(new DenialOfAccessError(err.message, true));
+    });
+};
 
 const getUsers = (req: Request, res: Response, next: NextFunction) => {
   User.find({})
@@ -14,9 +33,14 @@ const getUsers = (req: Request, res: Response, next: NextFunction) => {
 };
 
 const createUser = (req: Request, res: Response, next: NextFunction) => {
-  const { name, about, avatar } = req.body;
+  const {
+    email, password, name, about, avatar,
+  } = req.body;
 
-  return User.create({ name, about, avatar })
+  return bcrypt.hash(password, 10)
+    .then((hash) => User.create({
+      email, password: hash, name, about, avatar,
+    }))
     .then((user) => {
       res.send({ data: user });
     })
@@ -103,6 +127,7 @@ const updateAvatar = (req: Request, res: Response, next: NextFunction) => {
 };
 
 export default {
+  login,
   getUser,
   getUsers,
   createUser,
