@@ -17,7 +17,6 @@ export const getCards = (req: Request, res: Response, next: NextFunction) => {
 
 export const createCard = (req: Request, res: Response, next: NextFunction) => {
   const { name, link, user } = req.body;
-
   return Card.create({ name, link, owner: user })
     .then((card) => {
       card
@@ -40,14 +39,13 @@ export const createCard = (req: Request, res: Response, next: NextFunction) => {
 
 export const deleteCard = (req: Request, res: Response, next: NextFunction) => {
   const { cardId } = req.params;
-
   Card.findById(cardId)
     .then((card) => {
       if (!card) {
         next(new NotFoundError());
         return null;
       }
-      if (!req.body.user || req.body.user._id !== card.owner) {
+      if (!req.body.user || req.body.user._id !== card.owner.toString()) {
         next(new DenialOfAccessError());
         return null;
       }

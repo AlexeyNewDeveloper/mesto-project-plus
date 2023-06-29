@@ -63,7 +63,7 @@ const createUser = (req: Request, res: Response, next: NextFunction) => {
     })
     .catch((err) => {
       if (err.code === 11000) {
-        next(new UserAlredyExistError(err.message));
+        next(new UserAlredyExistError());
         return;
       }
       if (err.name === errorNames.VALIDATION_FIELD_ERROR) {

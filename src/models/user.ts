@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema<IUser, IUserModel>({
     unique: true,
     validate: {
       validator: (email: string) => validator.isEmail(email),
-      message: `${separator}Email введен некорректно, либо такой пользователь уже есть.`,
+      message: `${separator}Email введен некорректно.`,
     },
   },
   password: {
@@ -36,9 +36,12 @@ const userSchema = new mongoose.Schema<IUser, IUserModel>({
     required: true,
     select: false,
     validate: {
-      validator: (pass: string) => /^.*(?=.{1,})(?=.*[a-zA-Z])(?=.*\d)(?=.*[!#$%&? "]).*$/.test(pass),
-      message: `${separator}Пароль должен содержать большие и маленькие буквы
-      , цифру, и один из спецсимволов: !#$%&?`,
+      validator: (pass: string) => /(.)/.test(pass),
+      message: `${separator}Пароль может быть любым.`,
+      // eslint-disable-next-line max-len
+      // validator: (pass: string) => /^.*(?=.{1,})(?=.*[a-zA-Z])(?=.*\d)(?=.*[!#$%&? "]).*$/.test(pass),
+      // message: `${separator}Пароль должен содержать большие и маленькие буквы
+      // , цифру, и один из спецсимволов: !#$%&?`,
     },
   },
   name: {
