@@ -4,6 +4,7 @@ import DefaultError from '../errors/default-error';
 import NotFoundError from '../errors/not-found-err';
 import IncorrectDataTransmitted from '../errors/incorrect-data-transmitted';
 import errorNames from '../constants/error-names';
+import DenialOfAccessError from '../errors/denial-of-access-error';
 
 export const getCards = (req: Request, res: Response, next: NextFunction) => {
   Card.find({})
@@ -16,7 +17,6 @@ export const getCards = (req: Request, res: Response, next: NextFunction) => {
 
 export const createCard = (req: Request, res: Response, next: NextFunction) => {
   const { name, link, user } = req.body;
-
   return Card.create({ name, link, owner: user })
     .then((card) => {
       card
@@ -39,15 +39,18 @@ export const createCard = (req: Request, res: Response, next: NextFunction) => {
 
 export const deleteCard = (req: Request, res: Response, next: NextFunction) => {
   const { cardId } = req.params;
-
-  Card.findByIdAndRemove(cardId)
+  Card.findById(cardId)
     .then((card) => {
       if (!card) {
         next(new NotFoundError());
-        return;
+        return null;
       }
-
-      res.send({ data: card });
+      if (!req.body.user || req.body.user._id !== card.owner.toString()) {
+        next(new DenialOfAccessError());
+        return null;
+      }
+      card.remove();
+      return res.send({ data: card });
     })
     .catch((err) => {
       next(new DefaultError(err.message));

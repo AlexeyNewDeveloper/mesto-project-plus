@@ -1,3 +1,5 @@
 export const NOT_FOUND_ERROR_CODE: 404 = 404;
 export const DEFAULT_ERROR_CODE: 500 = 500;
 export const INCORRECT_TRANSMITTED_DATA_ERROR_CODE: 400 = 400;
+export const DENIAL_OF_ACCESS: 401 = 401;
+export const USER_ALREDY_EXIST: 409 = 409;
