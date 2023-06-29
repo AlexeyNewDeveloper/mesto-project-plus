@@ -36,8 +36,8 @@ const userSchema = new mongoose.Schema<IUser, IUserModel>({
     required: true,
     select: false,
     validate: {
-      validator: (pass: string) => /^.*(?=.{8,})(?=.*[a-zA-Z])(?=.*\d)(?=.*[!#$%&? "]).*$/.test(pass),
-      message: `${separator}Пароль должен содержать больше 8 символов, большие и маленькие буквы
+      validator: (pass: string) => /^.*(?=.{1,})(?=.*[a-zA-Z])(?=.*\d)(?=.*[!#$%&? "]).*$/.test(pass),
+      message: `${separator}Пароль должен содержать большие и маленькие буквы
       , цифру, и один из спецсимволов: !#$%&?`,
     },
   },
