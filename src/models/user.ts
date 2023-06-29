@@ -33,6 +33,7 @@ const userSchema = new mongoose.Schema<IUser, IUserModel>({
   password: {
     type: String,
     required: true,
+    select: false,
     validate: {
       validator: (pass: string) => /^.*(?=.{8,})(?=.*[a-zA-Z])(?=.*\d)(?=.*[!#$%&? "]).*$/.test(pass),
       message: `${separator}Пароль должен содержать больше 8 символов, большие и маленькие буквы
@@ -71,7 +72,7 @@ const userSchema = new mongoose.Schema<IUser, IUserModel>({
 });
 
 userSchema.static('findUserByCredentials', function findUserByCredentials(email: string, password: string) {
-  return this.findOne({ email })
+  return this.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
         return Promise.reject(new IncorrectDataTransmitted('Неправильные почта или пароль', true));

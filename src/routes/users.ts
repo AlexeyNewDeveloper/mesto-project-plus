@@ -5,7 +5,7 @@ import UsersControllers from '../controllers/users';
 const router = Router();
 
 router.get('/', UsersControllers.getUsers);
-router.post('/', UsersControllers.createUser);
+router.get('/me', UsersControllers.getMyProfile);
 router.get('/:userId', UsersControllers.getUser);
 router.patch('/me', UsersControllers.updateProfile);
 router.patch('/me/avatar', UsersControllers.updateAvatar);

@@ -2,6 +2,8 @@ import express, { ErrorRequestHandler } from 'express';
 import mongoose from 'mongoose';
 import usersRouter from './routes/users';
 import cardsRouter from './routes/cards';
+import UsersControllers from './controllers/users';
+import auth from './middlewares/auth';
 
 const { PORT = 3000 } = process.env;
 
@@ -16,13 +18,10 @@ mongoose.connect('mongodb://localhost:27017/mestodb');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use((req, res, next) => {
-  req.body.user = {
-    _id: '649866319e2266ab4ef69072',
-  };
+app.post('/signin', UsersControllers.login);
+app.post('/signup', UsersControllers.createUser);
 
-  next();
-});
+app.use(auth);
 
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);

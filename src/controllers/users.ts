@@ -8,6 +8,22 @@ import DenialOfAccessError from '../errors/denial-of-access-error';
 import IncorrectDataTransmitted from '../errors/incorrect-data-transmitted';
 import errorNames from '../constants/error-names';
 
+const getMyProfile = (req: Request, res: Response, next: NextFunction) => {
+  const { user } = req.body;
+
+  User.findById(user._id)
+    .then((userProfile) => {
+      if (!userProfile) {
+        next(new NotFoundError());
+        return;
+      }
+      res.send({ data: userProfile });
+    })
+    .catch((err) => {
+      next(new DefaultError(err.message));
+    });
+};
+
 const login = (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body;
 
@@ -127,6 +143,7 @@ const updateAvatar = (req: Request, res: Response, next: NextFunction) => {
 };
 
 export default {
+  getMyProfile,
   login,
   getUser,
   getUsers,

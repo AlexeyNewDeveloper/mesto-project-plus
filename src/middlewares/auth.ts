@@ -1,0 +1,23 @@
+import { Request, Response, NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
+import DenialOfAccessError from '../errors/denial-of-access-error';
+
+export default (req: Request, res: Response, next: NextFunction) => {
+  const { authorization } = req.headers;
+
+  if (!authorization || !authorization.startsWith('Bearer ')) {
+    return new DenialOfAccessError('Необходима авторизация');
+  }
+
+  const token = authorization.replace('Bearer ', '');
+  let payload;
+  try {
+    payload = jwt.verify(token, 'some-secret-key');
+  } catch (err) {
+    return new DenialOfAccessError('Необходима авторизация');
+  }
+  req.body.user = payload;
+
+  next();
+  return null;
+};
