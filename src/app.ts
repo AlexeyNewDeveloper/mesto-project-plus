@@ -1,9 +1,11 @@
 import express, { ErrorRequestHandler } from 'express';
 import mongoose from 'mongoose';
+import { errors } from 'celebrate';
 import usersRouter from './routes/users';
 import cardsRouter from './routes/cards';
 import UsersControllers from './controllers/users';
 import auth from './middlewares/auth';
+import logger from './middlewares/logger';
 
 const { PORT = 3000 } = process.env;
 
@@ -18,6 +20,8 @@ mongoose.connect('mongodb://localhost:27017/mestodb');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use(logger.requestLogger);
+
 app.post('/signin', UsersControllers.login);
 app.post('/signup', UsersControllers.createUser);
 
@@ -25,6 +29,10 @@ app.use(auth);
 
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
+
+app.use(logger.errorLogger);
+
+app.use(errors());
 
 app.use(errorHandler);
 

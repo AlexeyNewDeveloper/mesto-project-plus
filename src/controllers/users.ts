@@ -5,6 +5,7 @@ import User from '../models/user';
 import DefaultError from '../errors/default-error';
 import NotFoundError from '../errors/not-found-err';
 import DenialOfAccessError from '../errors/denial-of-access-error';
+import UserAlredyExistError from '../errors/user-alredy-exist-error';
 import IncorrectDataTransmitted from '../errors/incorrect-data-transmitted';
 import errorNames from '../constants/error-names';
 
@@ -61,6 +62,10 @@ const createUser = (req: Request, res: Response, next: NextFunction) => {
       res.send({ data: user });
     })
     .catch((err) => {
+      if (err.code === 11000) {
+        next(new UserAlredyExistError(err.message));
+        return;
+      }
       if (err.name === errorNames.VALIDATION_FIELD_ERROR) {
         next(new IncorrectDataTransmitted(err.message));
         return;

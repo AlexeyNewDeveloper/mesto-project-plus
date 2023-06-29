@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import validator from 'validator';
 import errorSeparator from '../constants/separators';
 import IncorrectDataTransmitted from '../errors/incorrect-data-transmitted';
+import DenialOfAccessError from '../errors/denial-of-access-error';
 
 const separator = errorSeparator.ERRORS_MESSAGES_SEPARATOR;
 
@@ -81,7 +82,7 @@ userSchema.static('findUserByCredentials', function findUserByCredentials(email:
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            return Promise.reject(new IncorrectDataTransmitted('Неправильные почта или пароль', true));
+            return Promise.reject(new DenialOfAccessError('Неправильные почта или пароль', true));
           }
 
           return user;
