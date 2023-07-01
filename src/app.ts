@@ -2,7 +2,8 @@ import express, {
   ErrorRequestHandler, NextFunction, Request, Response,
 } from 'express';
 import mongoose from 'mongoose';
-import { errors } from 'celebrate';
+import validator from 'validator';
+import { errors, celebrate, Joi } from 'celebrate';
 import usersRouter from './routes/users';
 import cardsRouter from './routes/cards';
 import UsersControllers from './controllers/users';
@@ -25,8 +26,22 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(logger.requestLogger);
 
-app.post('/signin', UsersControllers.login);
-app.post('/signup', UsersControllers.createUser);
+app.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().custom((value) => validator.isEmail(value)).required(),
+    password: Joi.string().required(),
+  }),
+}), UsersControllers.login);
+
+app.post('/signup', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().custom((value) => validator.isEmail(value)).required(),
+    password: Joi.string().required(),
+    name: Joi.string().pattern(/[A-Za-z\u0410-\u044F\u0401\u0451]{2,30}/),
+    about: Joi.string().pattern(/[A-Za-z\u0410-\u044F\u0401\u0451]{2,200}/),
+    avatar: Joi.string().pattern(/(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\\/~+#-]*[\w@?^=%&\\/~+#-])/),
+  }),
+}), UsersControllers.createUser);
 
 app.use(auth);
 
