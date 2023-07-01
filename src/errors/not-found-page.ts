@@ -2,7 +2,7 @@ import utils from '../utils/utils';
 import { NOT_FOUND_ERROR_CODE } from '../constants/error-code';
 
 export default class NotFoundPageError extends Error {
-  protected statusCode: number;
+  private statusCode: number;
 
   constructor(message?: string, bdError = false) {
     const defaultErrorText: string = 'Такой страницы не существует.';
