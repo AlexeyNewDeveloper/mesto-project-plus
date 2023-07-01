@@ -1,4 +1,6 @@
-import express, { ErrorRequestHandler } from 'express';
+import express, {
+  ErrorRequestHandler, NextFunction, Request, Response,
+} from 'express';
 import mongoose from 'mongoose';
 import { errors } from 'celebrate';
 import usersRouter from './routes/users';
@@ -6,6 +8,7 @@ import cardsRouter from './routes/cards';
 import UsersControllers from './controllers/users';
 import auth from './middlewares/auth';
 import logger from './middlewares/logger';
+import NotFoundPageError from './errors/not-found-page';
 
 const { PORT = 3000 } = process.env;
 
@@ -29,6 +32,11 @@ app.use(auth);
 
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
+
+app.get('*', (req: Request, res: Response, next: NextFunction) => {
+  next(new NotFoundPageError());
+  return null;
+});
 
 app.use(logger.errorLogger);
 

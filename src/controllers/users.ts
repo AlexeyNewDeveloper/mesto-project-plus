@@ -4,10 +4,10 @@ import { Request, Response, NextFunction } from 'express';
 import User from '../models/user';
 import DefaultError from '../errors/default-error';
 import NotFoundError from '../errors/not-found-err';
-import DenialOfAccessError from '../errors/denial-of-access-error';
 import UserAlredyExistError from '../errors/user-alredy-exist-error';
 import IncorrectDataTransmitted from '../errors/incorrect-data-transmitted';
 import errorNames from '../constants/error-names';
+import SECRET from '../constants/secret';
 
 const getMyProfile = (req: Request, res: Response, next: NextFunction) => {
   const { user } = req.body;
@@ -30,14 +30,14 @@ const login = (req: Request, res: Response, next: NextFunction) => {
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+      const token = jwt.sign({ _id: user._id }, SECRET, { expiresIn: '7d' });
       res.set({
         'Set-Cookie': `token=${token}`,
       });
-      res.send({ token });
+      res.send({ message: 'Успешно.' });
     })
     .catch((err: Error) => {
-      next(new DenialOfAccessError(err.message, true));
+      next(new DefaultError(err.message));
     });
 };
 
@@ -59,7 +59,10 @@ const createUser = (req: Request, res: Response, next: NextFunction) => {
       email, password: hash, name, about, avatar,
     }))
     .then((user) => {
-      res.send({ data: user });
+      const { password: createdPass, ...createdUser } = user.toObject();
+      res.send({
+        data: createdUser,
+      });
     })
     .catch((err) => {
       if (err.code === 11000) {
@@ -127,7 +130,6 @@ const updateAvatar = (req: Request, res: Response, next: NextFunction) => {
     { avatar },
     {
       new: true,
-      upsert: true,
       runValidators: true,
     },
   )

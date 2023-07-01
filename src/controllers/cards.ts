@@ -49,8 +49,7 @@ export const deleteCard = (req: Request, res: Response, next: NextFunction) => {
         next(new DenialOfAccessError());
         return null;
       }
-      card.remove();
-      return res.send({ data: card });
+      return card.remove().then((removedCard) => res.send({ data: removedCard }));
     })
     .catch((err) => {
       next(new DefaultError(err.message));
