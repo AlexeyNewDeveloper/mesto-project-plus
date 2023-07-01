@@ -17,9 +17,9 @@ router.post('/', celebrate({
     authorization: Joi.string().required(),
   }).unknown(true),
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
+    name: Joi.string().min(2).max(30).required(),
     link: Joi.string().required().pattern(/(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\\/~+#-]*[\w@?^=%&\\/~+#-])/),
-  }).unknown(true),
+  }),
 }), createCard);
 
 router.delete('/:cardId', celebrate({
@@ -27,7 +27,7 @@ router.delete('/:cardId', celebrate({
     authorization: Joi.string().required(),
   }).unknown(true),
   params: Joi.object().keys({
-    cardId: Joi.string().required(),
+    cardId: Joi.string().hex().length(24).required(),
   }),
 }), deleteCard);
 
@@ -36,7 +36,7 @@ router.put('/:cardId/likes', celebrate({
     authorization: Joi.string().required(),
   }).unknown(true),
   params: Joi.object().keys({
-    cardId: Joi.string().required(),
+    cardId: Joi.string().hex().length(24).required(),
   }),
 }), likeCard);
 
@@ -45,7 +45,7 @@ router.delete('/:cardId/likes', celebrate({
     authorization: Joi.string().required(),
   }).unknown(true),
   params: Joi.object().keys({
-    cardId: Joi.string().required(),
+    cardId: Joi.string().hex().length(24).required(),
   }),
 }), dislikeCard);
 
