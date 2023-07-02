@@ -14,7 +14,6 @@ export default (req: Request, res: Response, next: NextFunction) => {
 
   const token = authorization.replace('Bearer ', '');
   let payload;
-
   try {
     payload = jwt.verify(token, SECRET);
   } catch (err) {

@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
@@ -6,23 +7,36 @@ import DefaultError from '../errors/default-error';
 import NotFoundError from '../errors/not-found-err';
 import UserAlredyExistError from '../errors/user-alredy-exist-error';
 import IncorrectDataTransmitted from '../errors/incorrect-data-transmitted';
-import errorNames from '../constants/error-names';
 import SECRET from '../constants/secret';
 
-const getMyProfile = (req: Request, res: Response, next: NextFunction) => {
-  const { user } = req.body;
+interface IUserDataFields {
+  [name: string]: string;
+}
 
-  User.findById(user._id)
-    .then((userProfile) => {
-      if (!userProfile) {
+interface IUpdateUserDataParamsFunc {
+  userId: string;
+  fields: IUserDataFields;
+  res: Response;
+  next: NextFunction
+}
+
+const getUser = (userId: string, res: Response, next: NextFunction) => {
+  User.findById(userId)
+    .then((user) => {
+      if (!user) {
         next(new NotFoundError());
         return;
       }
-      res.send({ data: userProfile });
+      res.send({ data: user });
     })
     .catch((err) => {
       next(new DefaultError(err.message));
     });
+};
+
+const getMyProfile = (req: Request, res: Response, next: NextFunction) => {
+  const { user } = req.body;
+  getUser(user._id, res, next);
 };
 
 const login = (req: Request, res: Response, next: NextFunction) => {
@@ -65,94 +79,70 @@ const createUser = (req: Request, res: Response, next: NextFunction) => {
       });
     })
     .catch((err) => {
-      if (err.code === 11000) {
-        next(new UserAlredyExistError());
+      if (err instanceof mongoose.Error.ValidationError) {
+        next(new IncorrectDataTransmitted(err.message));
         return;
       }
-      if (err.name === errorNames.VALIDATION_FIELD_ERROR) {
-        next(new IncorrectDataTransmitted(err.message));
+      if (err.code === 11000) {
+        next(new UserAlredyExistError());
         return;
       }
       next(new DefaultError());
     });
 };
 
-const getUser = (req: Request, res: Response, next: NextFunction) => {
+const getUserByParamId = (req: Request, res: Response, next: NextFunction) => {
   const { userId } = req.params;
 
-  User.findById(userId)
-    .then((user) => {
-      if (!user) {
-        next(new NotFoundError());
-        return;
-      }
-      res.send({ data: user });
-    })
-    .catch((err) => {
-      next(new DefaultError(err.message));
-    });
+  getUser(userId, res, next);
 };
+
+const updateUserData = ({
+  userId, fields, res, next,
+}: IUpdateUserDataParamsFunc) => User.findByIdAndUpdate(
+  userId,
+  fields,
+  {
+    new: true,
+    runValidators: true,
+  },
+)
+  .then((user) => {
+    if (!user) {
+      next(new NotFoundError());
+      return;
+    }
+    res.send({ data: user });
+  })
+  .catch((err) => {
+    if (err instanceof mongoose.Error.ValidationError) {
+      next(new IncorrectDataTransmitted(err.message));
+      return;
+    }
+    next(new DefaultError());
+  });
 
 const updateProfile = (req: Request, res: Response, next: NextFunction) => {
   const { name, about } = req.body;
   const userId = req.body.user._id;
 
-  User.findByIdAndUpdate(
-    userId,
-    { name, about },
-    {
-      new: true,
-      runValidators: true,
-    },
-  )
-    .then((user) => {
-      if (!user) {
-        next(new NotFoundError());
-        return;
-      }
-      res.send({ data: user });
-    })
-    .catch((err) => {
-      if (err.name === errorNames.VALIDATION_FIELD_ERROR) {
-        next(new IncorrectDataTransmitted(err.message));
-        return;
-      }
-      next(new DefaultError());
-    });
+  updateUserData({
+    userId, fields: { name, about }, res, next,
+  });
 };
 
 const updateAvatar = (req: Request, res: Response, next: NextFunction) => {
   const { avatar } = req.body;
   const userId = req.body.user._id;
-
-  User.findByIdAndUpdate(
-    userId,
-    { avatar },
-    {
-      new: true,
-      runValidators: true,
-    },
-  )
-    .then((user) => {
-      if (!user) {
-        next(new NotFoundError());
-        return;
-      }
-      res.send({ data: user });
-    })
-    .catch((err) => {
-      if (err.name === errorNames.VALIDATION_FIELD_ERROR) {
-        next(new IncorrectDataTransmitted(err.message));
-        return;
-      }
-      next(new DefaultError());
-    });
+  updateUserData({
+    userId, fields: { avatar }, res, next,
+  });
 };
 
 export default {
   getMyProfile,
   login,
-  getUser,
+  getUserByParamId,
   getUsers,
   createUser,
   updateAvatar,
