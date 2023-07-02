@@ -4,8 +4,7 @@ import express, {
 import mongoose from 'mongoose';
 import validator from 'validator';
 import { errors, celebrate, Joi } from 'celebrate';
-import usersRouter from './routes/users';
-import cardsRouter from './routes/cards';
+import routes from './routes';
 import UsersControllers from './controllers/users';
 import auth from './middlewares/auth';
 import logger from './middlewares/logger';
@@ -44,8 +43,8 @@ app.post('/signup', celebrate({
 
 app.use(auth);
 
-app.use('/users', usersRouter);
-app.use('/cards', cardsRouter);
+app.use('/users', routes.usersRouter);
+app.use('/cards', routes.cardsRouter);
 
 app.get('*', (req: Request, res: Response, next: NextFunction) => {
   next(new NotFoundPageError());
