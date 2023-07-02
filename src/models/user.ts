@@ -2,8 +2,7 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import validator from 'validator';
 import errorSeparator from '../constants/separators';
-import IncorrectDataTransmitted from '../errors/incorrect-data-transmitted';
-import DenialOfAccessError from '../errors/denial-of-access-error';
+import AuthorizationError from '../errors/authorization-error';
 
 const separator = errorSeparator.ERRORS_MESSAGES_SEPARATOR;
 
@@ -35,42 +34,26 @@ const userSchema = new mongoose.Schema<IUser, IUserModel>({
     type: String,
     required: true,
     select: false,
-    validate: {
-      validator: (pass: string) => /(.)/.test(pass),
-      message: `${separator}Пароль может быть любым.`,
-      // eslint-disable-next-line max-len
-      // validator: (pass: string) => /^.*(?=.{1,})(?=.*[a-zA-Z])(?=.*\d)(?=.*[!#$%&? "]).*$/.test(pass),
-      // message: `${separator}Пароль должен содержать большие и маленькие буквы
-      // , цифру, и один из спецсимволов: !#$%&?`,
-    },
   },
   name: {
     type: String,
     required: false,
-    validate: {
-      validator: (name: string) => /[A-Za-z\u0410-\u044F\u0401\u0451]{2,30}/.test(name),
-      message: `${separator}Некорректное имя.`,
-    },
+    trim: true,
+    match: /[A-Za-z\u0410-\u044F\u0401\u0451]{2,30}/,
     default: 'Жак-Ив Кусто',
   },
   about: {
     type: String,
     required: false,
-    validate: {
-      validator: (about: string) => /[A-Za-z\u0410-\u044F\u0401\u0451]{2,200}/.test(about),
-      message: `${separator}Проверьте поле с описанием.`,
-    },
+    trim: true,
+    match: /[A-Za-z\u0410-\u044F\u0401\u0451]{2,200}/,
     default: 'Исследователь',
   },
   avatar: {
     type: String,
     required: false,
-    validate: {
-      validator: (avatar: string) => /(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\\/~+#-]*[\w@?^=%&\\/~+#-])/.test(
-        avatar,
-      ),
-      message: `${separator}Неправильная ссылка на аватар.`,
-    },
+    trim: true,
+    match: /(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\\/~+#-]*[\w@?^=%&\\/~+#-])/,
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
   },
 });
@@ -79,13 +62,13 @@ userSchema.static('findUserByCredentials', function findUserByCredentials(email:
   return this.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        return Promise.reject(new IncorrectDataTransmitted('Неправильные почта или пароль', true));
+        return Promise.reject(new AuthorizationError());
       }
 
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            return Promise.reject(new DenialOfAccessError('Неправильные почта или пароль', true));
+            return Promise.reject(new AuthorizationError());
           }
 
           return user;

@@ -15,29 +15,19 @@ const cardSchema = new mongoose.Schema<ICard>({
   name: {
     type: String,
     required: true,
-    validate: {
-      validator: (name: string) => /[A-Za-z\u0410-\u044F\u0401\u0451]{2,30}/.test(name),
-      message: `${separator}Некорректное имя.`,
-    },
+    trim: true,
+    match: /[A-Za-z\u0410-\u044F\u0401\u0451]{2,30}/,
   },
   link: {
     type: String,
     required: true,
-    validate: {
-      validator: (link: string) => /(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\\/~+#-]*[\w@?^=%&\\/~+#-])/.test(
-        link,
-      ),
-      message: `${separator}Некорректная ссылка на картинку.`,
-    },
+    trim: true,
+    match: /(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\\/~+#-]*[\w@?^=%&\\/~+#-])/,
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user',
     required: true,
-    validate: {
-      validator: (owner: string) => mongoose.Types.ObjectId.isValid(owner),
-      message: `${separator}Ошибка.`,
-    },
   },
   likes: {
     type: [mongoose.Schema.Types.ObjectId],
@@ -51,10 +41,6 @@ const cardSchema = new mongoose.Schema<ICard>({
   createdAt: {
     type: Date,
     default: Date.now,
-    validate: {
-      validator: (date: Date) => date instanceof Date,
-      message: `${separator}Ошибка.`,
-    },
   },
 });
 

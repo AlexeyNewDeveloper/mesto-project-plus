@@ -1,13 +1,14 @@
-import express, { ErrorRequestHandler } from 'express';
+import express, {
+  ErrorRequestHandler, NextFunction, Request, Response,
+} from 'express';
 import mongoose from 'mongoose';
-import { errors } from 'celebrate';
-import usersRouter from './routes/users';
-import cardsRouter from './routes/cards';
+import { errors, celebrate, Joi } from 'celebrate';
+import routes from './routes';
 import UsersControllers from './controllers/users';
 import auth from './middlewares/auth';
 import logger from './middlewares/logger';
-
-const { PORT = 3000 } = process.env;
+import NotFoundPageError from './errors/not-found-page';
+import appConfig from './config/app-config';
 
 const app = express();
 // eslint-disable-next-line no-unused-vars
@@ -22,13 +23,32 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(logger.requestLogger);
 
-app.post('/signin', UsersControllers.login);
-app.post('/signup', UsersControllers.createUser);
+app.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required(),
+    password: Joi.string().required(),
+  }),
+}), UsersControllers.login);
+
+app.post('/signup', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required(),
+    password: Joi.string().required(),
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(200),
+    avatar: Joi.string(),
+  }),
+}), UsersControllers.createUser);
 
 app.use(auth);
 
-app.use('/users', usersRouter);
-app.use('/cards', cardsRouter);
+app.use('/users', routes.usersRouter);
+app.use('/cards', routes.cardsRouter);
+
+app.get('*', (req: Request, res: Response, next: NextFunction) => {
+  next(new NotFoundPageError());
+  return null;
+});
 
 app.use(logger.errorLogger);
 
@@ -36,6 +56,6 @@ app.use(errors());
 
 app.use(errorHandler);
 
-app.listen(PORT, () => {
+app.listen(appConfig.PORT, () => {
   // console.log(`App listening on port ${PORT}`);
 });
