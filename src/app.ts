@@ -10,8 +10,7 @@ import UsersControllers from './controllers/users';
 import auth from './middlewares/auth';
 import logger from './middlewares/logger';
 import NotFoundPageError from './errors/not-found-page';
-
-const { PORT = 3000 } = process.env;
+import appConfig from './config/app-config';
 
 const app = express();
 // eslint-disable-next-line no-unused-vars
@@ -59,6 +58,6 @@ app.use(errors());
 
 app.use(errorHandler);
 
-app.listen(PORT, () => {
+app.listen(appConfig.PORT, () => {
   // console.log(`App listening on port ${PORT}`);
 });
