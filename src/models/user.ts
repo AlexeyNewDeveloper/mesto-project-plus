@@ -39,14 +39,16 @@ const userSchema = new mongoose.Schema<IUser, IUserModel>({
     type: String,
     required: false,
     trim: true,
-    match: /[A-Za-z\u0410-\u044F\u0401\u0451]{2,30}/,
+    minlength: 2,
+    maxlength: 30,
     default: 'Жак-Ив Кусто',
   },
   about: {
     type: String,
     required: false,
     trim: true,
-    match: /[A-Za-z\u0410-\u044F\u0401\u0451]{2,200}/,
+    minlength: 2,
+    maxlength: 200,
     default: 'Исследователь',
   },
   avatar: {

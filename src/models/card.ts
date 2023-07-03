@@ -1,7 +1,4 @@
 import mongoose, { Date } from 'mongoose';
-import errorSeparator from '../constants/separators';
-
-const separator = errorSeparator.ERRORS_MESSAGES_SEPARATOR;
 
 interface ICard {
   name: string;
@@ -16,7 +13,8 @@ const cardSchema = new mongoose.Schema<ICard>({
     type: String,
     required: true,
     trim: true,
-    match: /[A-Za-z\u0410-\u044F\u0401\u0451]{2,30}/,
+    minlength: 2,
+    maxlength: 30,
   },
   link: {
     type: String,
@@ -33,10 +31,6 @@ const cardSchema = new mongoose.Schema<ICard>({
     type: [mongoose.Schema.Types.ObjectId],
     ref: 'user',
     default: [],
-    validate: {
-      validator: (likes: Array<string>) => likes.every((v) => mongoose.Types.ObjectId.isValid(v)),
-      message: `${separator}Ошибка.`,
-    },
   },
   createdAt: {
     type: Date,
