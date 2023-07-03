@@ -1,6 +1,7 @@
 import express, {
   ErrorRequestHandler, NextFunction, Request, Response,
 } from 'express';
+import validator from 'validator';
 import mongoose from 'mongoose';
 import { errors, celebrate, Joi } from 'celebrate';
 import routes from './routes';
@@ -25,18 +26,28 @@ app.use(logger.requestLogger);
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
-    email: Joi.string().required(),
+    email: Joi.string().required().custom((email) => {
+      if (validator.isEmail(email)) {
+        return email;
+      }
+      return false;
+    }),
     password: Joi.string().required(),
   }),
 }), UsersControllers.login);
 
 app.post('/signup', celebrate({
   body: Joi.object().keys({
-    email: Joi.string().required(),
+    email: Joi.string().required().custom((email) => {
+      if (validator.isEmail(email)) {
+        return email;
+      }
+      return false;
+    }),
     password: Joi.string().required(),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(200),
-    avatar: Joi.string(),
+    avatar: Joi.string().pattern(/(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\\/~+#-]*[\w@?^=%&\\/~+#-])/),
   }),
 }), UsersControllers.createUser);
 
