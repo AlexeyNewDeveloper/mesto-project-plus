@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import User from '../models/user';
 import DefaultError from '../errors/default-error';
@@ -14,13 +14,13 @@ interface IUserDataFields {
 }
 
 interface IUpdateUserDataParamsFunc {
-  userId: string;
+  userId: string | JwtPayload;
   fields: IUserDataFields;
   res: Response;
   next: NextFunction
 }
 
-const getUser = (userId: string, res: Response, next: NextFunction) => {
+const getUser = (userId: string | JwtPayload, res: Response, next: NextFunction) => {
   User.findById(userId)
     .then((user) => {
       if (!user) {
@@ -35,7 +35,7 @@ const getUser = (userId: string, res: Response, next: NextFunction) => {
 };
 
 const getMyProfile = (req: Request, res: Response, next: NextFunction) => {
-  const { user } = req.body;
+  const { user } = req;
   getUser(user._id, res, next);
 };
 
@@ -124,7 +124,7 @@ const updateUserData = ({
 
 const updateProfile = (req: Request, res: Response, next: NextFunction) => {
   const { name, about } = req.body;
-  const userId = req.body.user._id;
+  const userId = req.user._id;
 
   updateUserData({
     userId, fields: { name, about }, res, next,
@@ -133,7 +133,7 @@ const updateProfile = (req: Request, res: Response, next: NextFunction) => {
 
 const updateAvatar = (req: Request, res: Response, next: NextFunction) => {
   const { avatar } = req.body;
-  const userId = req.body.user._id;
+  const userId = req.user._id;
   updateUserData({
     userId, fields: { avatar }, res, next,
   });

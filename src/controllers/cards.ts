@@ -16,7 +16,8 @@ export const getCards = (req: Request, res: Response, next: NextFunction) => {
 };
 
 export const createCard = (req: Request, res: Response, next: NextFunction) => {
-  const { name, link, user } = req.body;
+  const { name, link } = req.body;
+  const { user } = req;
   return Card.create({ name, link, owner: user })
     .then((card) => {
       card
@@ -45,7 +46,7 @@ export const deleteCard = (req: Request, res: Response, next: NextFunction) => {
         next(new NotFoundError());
         return null;
       }
-      if (!req.body.user || req.body.user._id !== card.owner.toString()) {
+      if (!req.user || req.user._id !== card.owner.toString()) {
         next(new DenialOfAccessError());
         return null;
       }
@@ -59,7 +60,7 @@ export const deleteCard = (req: Request, res: Response, next: NextFunction) => {
 export const likeCard = (req: Request, res: Response, next: NextFunction) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
-    { $addToSet: { likes: req.body.user._id } },
+    { $addToSet: { likes: req.user._id } },
     { new: true },
   )
     .then((card) => {
@@ -82,7 +83,7 @@ export const likeCard = (req: Request, res: Response, next: NextFunction) => {
 // eslint-disable-next-line max-len
 export const dislikeCard = (req: Request, res: Response, next: NextFunction) => Card.findByIdAndUpdate(
   req.params.cardId,
-  { $pull: { likes: req.body.user._id } },
+  { $pull: { likes: req.user._id } },
   { new: true },
 )
   .then((card) => {
