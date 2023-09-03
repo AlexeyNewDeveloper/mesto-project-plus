@@ -20,7 +20,7 @@ export default (req: Request, res: Response, next: NextFunction) => {
     next(new DenialOfAccessError('Необходима авторизация', true));
     return null;
   }
-  req.body.user = payload;
+  req.user._id = payload;
 
   next();
   return null;
