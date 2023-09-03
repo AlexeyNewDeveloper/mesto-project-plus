@@ -10,6 +10,7 @@ import auth from './middlewares/auth';
 import logger from './middlewares/logger';
 import NotFoundPageError from './errors/not-found-page';
 import appConfig from './config/app-config';
+import { IRequest } from './types/types';
 
 const app = express();
 // eslint-disable-next-line no-unused-vars
@@ -25,8 +26,10 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(logger.requestLogger);
 
-app.use((req, res, next) => {
-  req.user = { _id: '' };
+app.use((req: IRequest, res, next) => {
+  if (!req.user) {
+    req.user = { _id: '' };
+  }
   next();
 });
 
