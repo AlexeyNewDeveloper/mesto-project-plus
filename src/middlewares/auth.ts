@@ -1,9 +1,10 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import DenialOfAccessError from '../errors/denial-of-access-error';
 import SECRET from '../constants/secret';
+import { IRequest } from '../types/types';
 
-export default (req: Request, res: Response, next: NextFunction) => {
+export default (req: IRequest, res: Response, next: NextFunction) => {
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
@@ -21,9 +22,9 @@ export default (req: Request, res: Response, next: NextFunction) => {
     return null;
   }
 
-  if (typeof payload === 'object' && payload._id) {
+  if (typeof payload === 'object' && payload._id && req.user) {
     req.user._id = payload._id;
-  } else {
+  } else if (typeof payload === 'string' && req.user) {
     req.user._id = payload;
   }
 

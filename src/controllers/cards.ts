@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { Request, Response, NextFunction } from 'express';
+import { IRequest } from '../types/types';
 import Card from '../models/card';
 import DefaultError from '../errors/default-error';
 import NotFoundError from '../errors/not-found-err';
@@ -15,7 +16,7 @@ export const getCards = (req: Request, res: Response, next: NextFunction) => {
     });
 };
 
-export const createCard = (req: Request, res: Response, next: NextFunction) => {
+export const createCard = (req: IRequest, res: Response, next: NextFunction) => {
   const { name, link } = req.body;
   const { user } = req;
   return Card.create({ name, link, owner: user })
@@ -38,7 +39,7 @@ export const createCard = (req: Request, res: Response, next: NextFunction) => {
     });
 };
 
-export const deleteCard = (req: Request, res: Response, next: NextFunction) => {
+export const deleteCard = (req: IRequest, res: Response, next: NextFunction) => {
   const { cardId } = req.params;
   Card.findById(cardId)
     .then((card) => {
@@ -57,10 +58,10 @@ export const deleteCard = (req: Request, res: Response, next: NextFunction) => {
     });
 };
 
-export const likeCard = (req: Request, res: Response, next: NextFunction) => {
+export const likeCard = (req: IRequest, res: Response, next: NextFunction) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
-    { $addToSet: { likes: req.user._id } },
+    { $addToSet: { likes: req.user?._id } },
     { new: true },
   )
     .then((card) => {
@@ -81,9 +82,9 @@ export const likeCard = (req: Request, res: Response, next: NextFunction) => {
 };
 
 // eslint-disable-next-line max-len
-export const dislikeCard = (req: Request, res: Response, next: NextFunction) => Card.findByIdAndUpdate(
+export const dislikeCard = (req: IRequest, res: Response, next: NextFunction) => Card.findByIdAndUpdate(
   req.params.cardId,
-  { $pull: { likes: req.user._id } },
+  { $pull: { likes: req.user?._id } },
   { new: true },
 )
   .then((card) => {

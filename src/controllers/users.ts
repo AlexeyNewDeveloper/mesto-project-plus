@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
+import { IRequest } from '../types/types';
 import User from '../models/user';
 import DefaultError from '../errors/default-error';
 import NotFoundError from '../errors/not-found-err';
@@ -34,9 +35,11 @@ const getUser = (userId: string | JwtPayload, res: Response, next: NextFunction)
     });
 };
 
-const getMyProfile = (req: Request, res: Response, next: NextFunction) => {
+const getMyProfile = (req: IRequest, res: Response, next: NextFunction) => {
   const { user } = req;
-  getUser(user._id, res, next);
+  if (user) {
+    getUser(user._id, res, next);
+  }
 };
 
 const login = (req: Request, res: Response, next: NextFunction) => {
@@ -122,21 +125,25 @@ const updateUserData = ({
     next(new DefaultError());
   });
 
-const updateProfile = (req: Request, res: Response, next: NextFunction) => {
+const updateProfile = (req: IRequest, res: Response, next: NextFunction) => {
   const { name, about } = req.body;
-  const userId = req.user._id;
+  const userId = req.user?._id;
 
-  updateUserData({
-    userId, fields: { name, about }, res, next,
-  });
+  if (userId) {
+    updateUserData({
+      userId, fields: { name, about }, res, next,
+    });
+  }
 };
 
-const updateAvatar = (req: Request, res: Response, next: NextFunction) => {
+const updateAvatar = (req: IRequest, res: Response, next: NextFunction) => {
   const { avatar } = req.body;
-  const userId = req.user._id;
-  updateUserData({
-    userId, fields: { avatar }, res, next,
-  });
+  const userId = req.user?._id;
+  if (userId) {
+    updateUserData({
+      userId, fields: { avatar }, res, next,
+    });
+  }
 };
 
 export default {
