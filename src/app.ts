@@ -14,6 +14,7 @@ import appConfig from './config/app-config';
 const app = express();
 // eslint-disable-next-line no-unused-vars
 const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
+  // res.status(err).send({ message: err });
   res.status(err.statusCode).send({ message: err.message });
 };
 
@@ -23,6 +24,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(logger.requestLogger);
+
+app.use((req, res, next) => {
+  req.user = { _id: '' };
+  next();
+});
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
@@ -68,5 +74,5 @@ app.use(errors());
 app.use(errorHandler);
 
 app.listen(appConfig.PORT, () => {
-  // console.log(`App listening on port ${PORT}`);
+  console.log('App listening on port');
 });
