@@ -1,6 +1,7 @@
 import express, {
   ErrorRequestHandler, NextFunction, Request, Response,
 } from 'express';
+import cors from 'cors';
 import validator from 'validator';
 import mongoose from 'mongoose';
 import { errors, celebrate, Joi } from 'celebrate';
@@ -12,6 +13,10 @@ import NotFoundPageError from './errors/not-found-page';
 import appConfig from './config/app-config';
 import { IRequest } from './types/types';
 
+const corsOptions = {
+  origin: ['http://frontend-mesto.nomoredomainsicu.ru', 'https://frontend-mesto.nomoredomainsicu.ru'],
+};
+
 const app = express();
 // eslint-disable-next-line no-unused-vars
 const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
@@ -20,6 +25,8 @@ const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
 };
 
 mongoose.connect('mongodb://localhost:27017/mestodb');
+
+app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
