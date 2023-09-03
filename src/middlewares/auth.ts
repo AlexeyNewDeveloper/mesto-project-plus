@@ -20,7 +20,12 @@ export default (req: Request, res: Response, next: NextFunction) => {
     next(new DenialOfAccessError('Необходима авторизация', true));
     return null;
   }
-  req.user._id = payload;
+
+  if (typeof payload === 'object' && payload._id) {
+    req.user._id = payload._id;
+  } else {
+    req.user._id = payload;
+  }
 
   next();
   return null;
