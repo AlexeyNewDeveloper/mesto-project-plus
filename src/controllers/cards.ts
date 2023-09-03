@@ -16,7 +16,6 @@ export const getCards = (req: Request, res: Response, next: NextFunction) => {
 };
 
 export const createCard = (req: Request, res: Response, next: NextFunction) => {
-  console.log('createCard', req.user);
   const { name, link } = req.body;
   const { user } = req;
   return Card.create({ name, link, owner: user })
