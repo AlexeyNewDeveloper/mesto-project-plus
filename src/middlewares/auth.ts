@@ -1,7 +1,7 @@
 import { Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import DenialOfAccessError from '../errors/denial-of-access-error';
-import SECRET from '../constants/secret';
+import JWT_SECRET from '../constants/secret';
 import { IRequest } from '../types/types';
 
 export default (req: IRequest, res: Response, next: NextFunction) => {
@@ -16,7 +16,7 @@ export default (req: IRequest, res: Response, next: NextFunction) => {
   const token = authorization.replace('Bearer ', '');
   let payload;
   try {
-    payload = jwt.verify(token, SECRET);
+    payload = jwt.verify(token, JWT_SECRET);
   } catch (err) {
     next(new DenialOfAccessError('Необходима авторизация', true));
     return null;

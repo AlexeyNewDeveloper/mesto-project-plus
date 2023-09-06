@@ -1,2 +1,2 @@
-const SECRET: 'some-secret-key' = 'some-secret-key';
-export default SECRET;
+const { JWT_SECRET = 'some-secret-key' } = process.env;
+export default JWT_SECRET;

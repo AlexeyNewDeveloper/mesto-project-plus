@@ -8,7 +8,7 @@ import DefaultError from '../errors/default-error';
 import NotFoundError from '../errors/not-found-err';
 import UserAlredyExistError from '../errors/user-alredy-exist-error';
 import IncorrectDataTransmitted from '../errors/incorrect-data-transmitted';
-import SECRET from '../constants/secret';
+import JWT_SECRET from '../constants/secret';
 
 interface IUserDataFields {
   [name: string]: string;
@@ -47,7 +47,7 @@ const login = (req: Request, res: Response, next: NextFunction) => {
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, SECRET, { expiresIn: '7d' });
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' });
       res.set({
         'Set-Cookie': `token=${token}`,
       });
