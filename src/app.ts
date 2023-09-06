@@ -13,9 +13,9 @@ import NotFoundPageError from './errors/not-found-page';
 import appConfig from './config/app-config';
 import { IRequest } from './types/types';
 
-// const corsOptions = {
-//   origin: ['http://frontend-mesto.nomoredomainsicu.ru', 'https://frontend-mesto.nomoredomainsicu.ru'],
-// };
+const corsOptions = {
+  origin: ['http://frontend-mesto.nomoredomainsicu.ru', 'https://frontend-mesto.nomoredomainsicu.ru'],
+};
 
 const app = express();
 // eslint-disable-next-line no-unused-vars
@@ -26,8 +26,8 @@ const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
 
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
-app.use(cors());
-// app.use(cors(corsOptions));
+// app.use(cors());
+app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
