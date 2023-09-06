@@ -68,13 +68,19 @@ const getUsers = (req: Request, res: Response, next: NextFunction) => {
 
 const createUser = (req: Request, res: Response, next: NextFunction) => {
   const {
-    email, password, name, about, avatar,
+    email, password,
   } = req.body;
+  // const {
+  //   email, password, name, about, avatar,
+  // } = req.body;
 
   return bcrypt.hash(password, 10)
     .then((hash) => User.create({
-      email, password: hash, name, about, avatar,
+      email, password: hash,
     }))
+    // .then((hash) => User.create({
+    //   email, password: hash, name, about, avatar,
+    // }))
     .then((user) => {
       const { password: createdPass, ...createdUser } = user.toObject();
       res.send({
