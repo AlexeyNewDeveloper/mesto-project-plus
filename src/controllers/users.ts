@@ -28,7 +28,7 @@ const getUser = (userId: string | JwtPayload, res: Response, next: NextFunction)
         next(new NotFoundError());
         return;
       }
-      res.send({ data: user });
+      res.send(user);
     })
     .catch((err) => {
       next(new DefaultError(err.message));
@@ -51,7 +51,7 @@ const login = (req: Request, res: Response, next: NextFunction) => {
       res.set({
         'Set-Cookie': `token=${token}`,
       });
-      res.send({ message: 'Успешно.' });
+      res.send({ message: 'Успешно.', token });
     })
     .catch((err: Error) => {
       next(new DefaultError(err.message));
@@ -121,7 +121,7 @@ const updateUserData = ({
       next(new NotFoundError());
       return;
     }
-    res.send({ data: user });
+    res.send(user);
   })
   .catch((err) => {
     if (err instanceof mongoose.Error.ValidationError) {
