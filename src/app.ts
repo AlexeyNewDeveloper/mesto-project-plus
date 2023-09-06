@@ -52,7 +52,7 @@ app.post('/signin', celebrate({
   }),
 }), UsersControllers.login);
 
-app.post('signup', celebrate({
+app.post('/signup', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().custom((email) => {
       if (validator.isEmail(email)) {
