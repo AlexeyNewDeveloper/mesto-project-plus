@@ -23,7 +23,7 @@ module.exports = {
       repo: "git@github.com:AlexeyNewDeveloper/mesto-project-plus.git",
       path: DEPLOY_PATH,
       "pre-deploy-local": `scp ./.env ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}`,
-      "post-deploy": "npm i && npm run build",
+      "post-deploy": "cd ~/mesto-project-plus/ && npm i && npm run build",
     },
   },
 };
